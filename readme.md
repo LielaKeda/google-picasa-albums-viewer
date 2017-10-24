@@ -1,12 +1,15 @@
-=== Google Photos Gallery with Shortcodes
----------
-=
+# Google Photos Gallery with Shortcodes
 
 Contributors: nakunakifi
+
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ZAZHU9ERY8W34
+
 Tags: album, gallery, slideshow, photo, google photos, google picasa, image, images gallery, lightbox, picasa, picasa web, photo, photos
+
 Requires at least: 3.0.1
+
 Tested up to: 4.7.5
+
 Stable tag: 3.0.13
 
 The best Google Photos Gallery plugin to display your Google Photo Albums on your WordPress blog. It is fully responsive and looks awesome. 
