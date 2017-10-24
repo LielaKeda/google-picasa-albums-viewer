@@ -1,4 +1,6 @@
-=== Google Photos Gallery with Shortcodes ===
+=== Google Photos Gallery with Shortcodes
+---------
+=
 
 Contributors: nakunakifi
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ZAZHU9ERY8W34
@@ -9,7 +11,9 @@ Stable tag: 3.0.13
 
 The best Google Photos Gallery plugin to display your Google Photo Albums on your WordPress blog. It is fully responsive and looks awesome. 
 
-== Description ==
+Description
+---------
+
 The best Google Photos Gallery plugin to display your Google Photo Albums on your WordPress blog. It is fully responsive and looks awesome. Google Photo Gallery is based on Google Picasa API. Use the plugin to display your Google Photo (Picasa) Albums on your WordPress blog. Using the shortcodes it is simple to embed a single album or all your albums. Display albums in grid view, list view or carousel. Image lightbox supports touch devices (Pro) and is fully responsive.
 
 * You get various display options for photo albums and the images with albums.
@@ -42,13 +46,17 @@ https://twitter.com/CheshireWebSol
 
 
 
-== Prerequisites ==
+Prerequisites
+---------
+
 
 1. PHP5
 2. cURL running on your web host
 
 
-== Installation ==
+Installation
+---------
+
 
 1. Unzip into your `/wp-content/plugins/` directory
 2. Activate the plugin through the 'Plugins' menu in WordPress
@@ -58,26 +66,38 @@ https://twitter.com/CheshireWebSol
 6. Update the shortcode used in step 4 to include the result_page option. [cws_gpp_albums results_page='page-slug-here']
 
 
-== Frequently Asked Questions ==
+Frequently Asked Questions
+---------
 
-= What if I don't want to display private (unlisted) albums? =
+
+What if I don't want to display private (unlisted) albums?
+---------
+
 
 Simple select "Public" option from the 'Show which albums' dropdown menu.
 
-= Does this work with Google Photos? =
+Does this work with Google Photos?
+---------
+
 
 Yes this plugin works with images and albums stored and created in Google Photos too.
 
-= Can Users Download the Original Image File =
+Can Users Download the Original Image File
+---------
+
 
 Yes this is an option on the <a href="http://www.cheshirewebsolutions.com/?utm_source=cws_gpp_config&utm_medium=text-link&utm_content=readme&utm_campaign=cws_gpp_plugin" rel="friend">Pro version</a> 
 
-= The Cache Doesn't Seem to be Working =
+The Cache Doesn't Seem to be Working
+---------
+
 
 Log in to you web host and check the cache/ folder is writable by the web server.
 
 
-== Screenshots ==
+Screenshots
+---------
+
 
 1. An example of Google Photos Album Grid View.
 2. An example of Google Photos Album List View.
@@ -86,7 +106,9 @@ Log in to you web host and check the cache/ folder is writable by the web server
 5. This is an example of the lightbox displaying photo you clicked on.
 
 
-== Shortcodes ==
+Shortcodes
+---------
+
 
 * [cws_gpp_albums] Will display your albums.
 
@@ -95,7 +117,9 @@ Log in to you web host and check the cache/ folder is writable by the web server
 * [cws_gpp_images_by_albumid] Will display images in the album specified via the 'id' attribute
 
 
-== Shortcode Usage ==
+Shortcode Usage
+---------
+
 
 * Display Albums Covers in a Carousel
 [cws_gpp_albums theme=carousel dots=1 slidestoshow=3 slidestoscroll=1 autoplay=1 arrows=1 results_page=results-carousel show_details=1 show_title=1 num_results=6 hide_albums='Profile Photos,Auto Backup']
@@ -163,7 +187,9 @@ For example
 [cws_gpp_images_in_album theme='grid' album_title=1 show_title=1  show_details=1]
 
 
-== Credits ==
+Credits
+---------
+
 
 * Google Picasa Viewer - Ian Kennerley, http://nakunakifi.com 
 * Google PHP Client Library (https://developers.google.com/api-client-library/php/)
@@ -175,116 +201,172 @@ For example
 * Justified Image Grid - Miro Mannino
 * Photoswipe - Dmitry Semenov
 
-== Changelog ==
+Changelog
+---------
 
-= 3.0.13 =
+
+3.0.13
+---------
+
 * Various improvements
 * Remove columnWidth from Masonry init to allow for centre positioning
 * Remove CSS opacity 0.8 on Album Thumbs
 * Remove 1px border bottom on projig view (Pro)
 * Fix Sidebar positioning bug that casued sidebar to appear below content
 
-= 3.0.12 =
+3.0.12
+---------
+
 Changed lightbox image width to be 800px, thanks to @rhormazar for the feedback
 
-= 3.0.11 =
+3.0.11
+---------
+
 Fixed bug where options saved are lost if plugin is deactivated then reactivated
 Added urleencode / stripslashes to Album Title
 Improve Widget Display
 Add Title and Caption options to lightbox
 
 
-= 3.0.10 =
+3.0.10
+---------
+
 Fixed bug conflict with other plugins using Google Library
 Fixed bug with Album Title disppearing if pagination was clicked
 Fixed album thumbnail size bug not repsecting value in plugin settings page
 Added option to show/hide pagination in Widget
 Various other little bits and bobs
 
-= 3.0.9 =
+3.0.9
+---------
+
 Added 'Getting Started' sub menu page to admin
 Fixed call for style_fx to be Pro only
 
-= 3.0.8 =
+3.0.8
+---------
+
 Fixed bug where if no theme option was provided in certain shortcodes in could result in feed error notice
 Added 'theme=grid' option to shortcode examples in Pro page
 
-= 3.0.7 =
+3.0.7
+---------
+
 Fixed pagination bug on home page
 
-= 3.0.6 =
+3.0.6
+---------
+
 Fixed grid link bug with permalinks disabled
 Fixed download original link bug where image could open in lightbox
 
-= 3.0.5 =
+3.0.5
+---------
+
 Fixed grid results layout bug
 
-= 3.0.4 =
+3.0.4
+---------
+
 Various layout improvements
 Carousel options added, arrows, infinite, slidestoshow, slidestoscroll, autoplay, autoplayinterval, speed, dots
 Image thumbnail settings bug fixed
 Album thumbnail settings bug fixed
 Various other little bits
 
-= 2.3.7 =
+2.3.7
+---------
+
 Added speed variable to init_slick.js
 Added empty array check for cache files
 
-= 2.3.6 =
+2.3.6
+---------
+
 Readme.txt updates and description
 
-= 2.3.5 =
+2.3.5
+---------
+
 Fixed: Warning: Missing argument notice when using theme pro_pbs (PRO ONLY)
 Added isFitWidth to Masonry init to allow for centering of grid via CSS
 
-= 2.3.4 =
+2.3.4
+---------
+
 Added Show Albums [Public, Private, All, Visible] (PRO ONLY)
 
-= 2.3.3 =
+2.3.3
+---------
+
 Added Justified Image Grid option (PRO ONLY)
 
-= 2.3.2 =
+2.3.2
+---------
+
 Fixed bug effecting the sidebar appearance
 
-= 2.3.1 =
+2.3.1
+---------
+
 Tidy up of error warning notices
 Tested with WordPress 4.6.1
 
-= 2.3.0 =
+2.3.0
+---------
+
 Many small bugfixes.
 Rewrote XML from Google Feed
 Added 50% Off code
 Added Top level menu to admin
 
-= 2.2.3 =
+2.2.3
+---------
+
 Bug fix: Carousel
 
-= 2.2.2 =
+2.2.2
+---------
+
 Bux fix: Album Images
 
-= 2.1.2 =
+2.1.2
+---------
+
 Paginaton added to Show Albums Widget
 Added default settings when first installed
 Bug fix - pagination under certain circumstance
 Among other things
 
-= 2.1.0 =
+2.1.0
+---------
+
 Changes Title and description.
 
-= 2.0.1 =
+2.0.1
+---------
+
 Added screenshots
 
-= 2.0 =
+2.0
+---------
+
 Complete rewrite. Brought about by Google turning off OAuth1
 Now supports OAuth2
 ONLY UPGRADE IF PREVIOUS VERSION STOPPED WORKING FOR YOU!
 All shortcodes have changed
 
-= 1.3.2 =
+1.3.2
+---------
+
 Fixed: Lost settings when updated Settings -> Reading
 
 
-== Upgrade Notice ==
+Upgrade Notice
+---------
+
  
-= 2.0 =
+2.0
+---------
+
 Version 2.0 introduces some radical changes to the plugin. Please make sure to back up your data just in case anything happens

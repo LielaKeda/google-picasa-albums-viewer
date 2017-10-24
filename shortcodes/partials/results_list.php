@@ -81,8 +81,8 @@ $desc = '';
 
                     // $strOutput .=  "<a class='example-image-link' href='" . $b['src'] . "' data-lightbox='example-set' data-title='" . $feed->title . "'><img alt='" . $feed->title . "' src='" . $a['url'] . "' title='" . $feed->title . "' /></a>\n";
                     //$strOutput .=  "<a itemprop=\"contentUrl\" data-size=\"". $content[0]['width'] ."x".$content[0]['height']."\" data-index=\"".$intCounter."\" class='result-image-link' href='" . $b['src'] . "' data-lightbox='example-set' data-title='" . $feed->title . "'><img alt='" . $feed->title . "' src='" . $a['url'] . "' title='" . $feed->title . "' /></a>\n";
-                    $strOutput .=  "<a itemprop=\"contentUrl\" data-caption=\"" . $desc .  "\" data-size=\"". $content[0]['width'] ."x".$content[0]['height']."\" data-index=\"".$intCounter."\" class='result-image-link' href='" . $b['src'] . "' data-lightbox='example-set' data-title='" . $feed->title . "'>\n";
-                    $strOutput .= "<img alt='" . $feed->title . "' src='" . $a['url'] . "' title='" . $feed->title . "' />";
+                    $strOutput .=  "<a itemprop=\"contentUrl\" data-caption=\"" . $desc .  "\" data-size=\"". $content[0]['width'] ."x".$content[0]['height']."\" data-index=\"".$intCounter."\" class='result-image-link' href='" . str_replace('s800', 's2000', $b['src']) . "' data-lightbox='example-set' data-title='" . $feed->title . "'>\n";
+                    $strOutput .= "<img alt='" . $feed->title . "' src='" . str_replace('s800', 's2000', $a['url']) . "' title='" . $feed->title . "' />";
 
                     $strOutput .= "</a>";
 

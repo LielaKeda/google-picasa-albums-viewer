@@ -89,7 +89,7 @@
 
             //$strOutput .= "<a itemprop=\"contentUrl\" data-size=\"". $content[0]['width'] ."x".$content[0]['height']."\" data-index=\"".$intCounter."\" class='result-image-link' href='" . $b['src'] . "' data-lightbox='result-set' data-title='$title'><img data-index=\"".$intCounter."\" class='result-image' src='" . $a['url'] . "' alt='$title'/></a>\n";
             // $strOutput .= "<a itemprop=\"contentUrl\" data-size=\"". $content[0]['width'] ."x".$content[0]['height']."\" data-index=\"".$intCounter."\" class='result-image-link' href='" . $b['src'] . "' data-lightbox='result-set' data-title='$title'><img data-index=\"".$intCounter."\" class='result-image' src='" . $a['url'] . "' alt='$title'/>\n";
-            $strOutput .= "<a itemprop=\"contentUrl\" data-size=\"". $content[0]['width'] ."x".$content[0]['height']."\" data-index=\"".$intCounter."\" class='result-image-link' href='" . $b['src'] . "' data-lightbox='result-set' data-title='$title'>\n";
+            $strOutput .= "<a itemprop=\"contentUrl\" data-size=\"". $content[0]['width'] ."x".$content[0]['height']."\" data-index=\"".$intCounter."\" class='result-image-link' href='" . str_replace('s800', 's2000', $b['src']) . "' data-lightbox='result-set' data-title='$title'>\n";
 
             $strOutput .="<img data-index=\"".$intCounter."\" class='result-image' src='" . $a['url'] . "' alt='$title'/>";
 
