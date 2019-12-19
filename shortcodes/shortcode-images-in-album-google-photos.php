@@ -16,28 +16,37 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
-function cws_gpp_shortcode_images_in_album( $atts ) {
+function cws_gpp_shortcode_images_in_album_google_photos( $atts ) {
 	
-    $cws_debug = '';
-    $cws_page = '';
+    $cws_debug  = '';
+    $cws_page   = '';
+    $nextPageToken = '';
     
-    if( isset( $_GET[ 'cws_debug' ] ) ){
-        $cws_debug = $_GET[ 'cws_debug' ]; // $cws_debug = get_query_var('cws_debug');
+    if( isset( $_GET[ 'cws_debug' ] ) ) {
+        $cws_debug = $_GET[ 'cws_debug' ];
     }
 
-    //$plugin = new CWS_Google_Picasa_Pro($plugin_name, $version, $isPro);
-    $plugin = new CWS_Google_Picasa_Pro();
-    
-    $plugin_admin = new CWS_Google_Picasa_Pro_Admin( $plugin->get_plugin_name(), $plugin->get_version(), $plugin->get_isPro() );
+    $plugin         = new CWS_Google_Picasa_Pro();
+    $plugin_admin   = new CWS_Google_Picasa_Pro_Admin( $plugin->get_plugin_name(), $plugin->get_version(), $plugin->get_isPro() );
 
     // If authenticated get list of albums
     if( $plugin_admin->isAuthenticated() == true  ) {
         
+        // $cws_album = $_GET[ 'cws_album' ]; 
+
+        if( isset( $_GET[ 'nextToken' ] ) ) {
+            $nextPageToken = $_GET['nextToken'];
+        }
+
+        // Grab the access token
+        $AccessToken = get_option( 'cws_gpp_access_token' ); 
+
         $options = get_option( 'cws_gpp_options' );
         $album_thumb_size = $options['album_thumb_size'];
 
         // set some defaults...
         $num_pages = 0;
+        $options['crop'] = '';
 
         $options['show_image_details'] = isset($options['show_image_details']) ? $options['show_image_details'] : "";
         $options['theme'] = isset($options['theme']) ? $options['theme'] : "";
@@ -47,201 +56,91 @@ function cws_gpp_shortcode_images_in_album( $atts ) {
         $options['row_height'] = isset($options['row_height']) ? $options['row_height'] : "251";
         $options['enable_download'] = isset($options['enable_download']) ? $options['enable_download'] : "";
 
-        extract( shortcode_atts( array(
-            'thumb_size'        => $options['thumb_size'], 
-            'show_title'        => $options['show_image_title'],
-            'show_details'      => $options['show_image_details'],
-            'num_results'       => $options['num_image_results'],
-            'theme'             => $options['theme'],   
-            'id'                => $options['id'],
-            'imgmax'            => $options['lightbox_image_size'],
-            'results_page'      => $options['results_page'],
-            'enable_cache'      => $options['enable_cache'],
-            'enable_download'   => $options['enable_download'],
-            'hide_albums'       => $options['hide_albums'],  
-            'row_height'        => $options['row_height'], 
-            'fx'                => NULL,
-            'album_title'       => 1,      
-        ), $atts ) );
+        // get options from shortcode and merge with defaults
+        // replaced extract()
+        $args = shortcode_atts( array(
+                'thumb_size'        => $options['thumb_size'], 
+                'crop'              => $options['crop'], 
+                'show_title'        => $options['show_image_title'],
+                'show_details'      => $options['show_image_details'],
+                'num_results'       => $options['num_image_results'],
+                'theme'             => $options['theme'],   
+                'id'                => $options['id'],
+                'imgmax'            => $options['lightbox_image_size'],
+                'results_page'      => $options['results_page'],
+                //'enable_cache'      => $options['enable_cache'],
+                'enable_download'   => $options['enable_download'],
+                'hide_albums'       => $options['hide_albums'],  
+                'row_height'        => $options['row_height'], 
+                'fx'                => NULL,
+                'album_title'       => 1,                       
+                                    ), $atts );
 
-        if( $hide_albums !== NULL ) {
-            $hide_albums = array_map( 'trim', explode( ',', $hide_albums ) );
-        }
+    // if we have one in url
+    if(isset( $_GET[ 'cws_album' ]) ){
+        $cws_album = $_GET[ 'cws_album' ]; 
+    }
+    // this is Pro only!
+    // 
+    elseif( $plugin->get_isPro() == 1 ) {
+        $cws_album = $args['id'];
+    }
+    
+    // set default for lightbox if missing
+    if(empty($args['imgmax'])){
+        $args['imgmax'] = 800;
+    }
 
-        //var_dump($fx);
 
-        // Create array from multiple ids set in shortcode, seperated by ','
+        $google_photos = new CWS_Google_Photos_Pro();
+        $response = $google_photos->getAlbumImagesGooglePhotos( $AccessToken, $args['thumb_size'], $args['show_title'], $cws_page, $args['num_results'], $cws_album, $args['imgmax'], $args['theme'], $nextPageToken );
+
+
+if( isset($_GET['cws_debug']) == 1 ) {
+    echo '<pre>';
+    print_r($args);
+    echo '</pre>'; 
+
+    echo 'response $response<br>';
+    echo '<pre>';
+    print_r($response);
+    echo '</pre>';   
+}
+
         /*
-        if( $id !== NULL ) {
-            $ids = array_map( 'trim', explode( ',', $id ) );
-        }
+        echo '<pre>';        
+        print_r($response);
+        //print_r($response[0]['mediaItems'][0]['mediaMetaData']['photo']['cameraMake']);
+        echo '</pre>';
         */
+        ///die();
+   
+        /*
+        echo '<pre>';        
+        print_r($response[0]['mediaItems'][0]);
+        //print_r($response[0]['mediaItems'][0]['mediaMetaData']['photo']['cameraMake']);
+        echo '</pre>';
 
-        // echo '<pre>';
-        // print_r($ids);
-        // echo '</pre>';
+        die();
+        */
+        $settings = array();
+        $settings['dimensions']['maxWidth'] = $args['thumb_size']; // guess these would be passed in via shortcode eventually therefor in partial
+        $settings['dimensions']['maxHeight'] = $args['thumb_size'];
+        $settings['crop'] = 1;
+        // $settings['results_page'] = $results_page;
 
-        if ( $show_title === 'false' ) $show_title = false; // just to be sure...
-        if ( $show_title === 'true' ) $show_title = true; // just to be sure...
-        if ( $show_title === '0' ) $show_title = false; // just to be sure...
-        if ( $show_title === '1' ) $show_title = true; // just to be sure...
-        $show_title = ( bool ) $show_title;          
-
-        if ( $show_details === 'false' ) $show_details = false; // just to be sure...
-        if ( $show_details === 'true' ) $show_details = true; // just to be sure...
-        if ( $show_details === '0' ) $show_details = false; // just to be sure...
-        if ( $show_details === '1' ) $show_details = true; // just to be sure...
-        $show_details = ( bool ) $show_details;       
-
-        // Grab album id
-		// $cws_album = get_query_var( 'cws_album' );
-        
-        // if no id set from [cws_gpp_images_by_albumid] then use $cws_album
-        if( $id === NULL || $id == "" ){
-
-            if( isset( $_GET['cws_album'] ) ){
-                $cws_album = $_GET[ 'cws_album' ]; // $cws_album = get_query_var( 'cws_album' );
-            }
-            
-        } else {
-            $cws_album = $id;
-        }
-
-        // Grab page from url
-        if( isset( $_GET['cws_page'] ) ){
-            $cws_page = $_GET[ 'cws_page' ]; // $cws_page = get_query_var( 'cws_page' );
-        }
-        
-        // Grab the access token
-        $AccessToken = get_option( 'cws_gpp_access_token' );
-
-        // no pagintaion required if results are carousel
-        if( $theme == "carousel" ) { $num_results = 0; }
-
-// var_dump($cws_album);
-/*
-echo "AccessToken: $AccessToken<br>";
-echo "thumb_size: $thumb_size<br>";
-echo "show_title: $show_title<br>";
-echo "cws_page: $cws_page<br>";
-echo "num_results: $num_results<br>";
-echo "cws_album: $cws_album<br>";
-echo "imgmax: $imgmax<br>";
-*/
-
-// test start foreach here...
-//foreach($ids as $cws_album) {
-
-$strOutput = "";
-$strOutput .=  $strOutput;
-
-    //echo "Call Picasa API for album ID: $cws_album<br>";
-    //print_r($ids);
-    // Get images in a specific album
-
-        #----------------------------------------------------------------------------
-        # Cache the album feed if it does not exist 
-        #----------------------------------------------------------------------------
-        // Set cache location
-        $myAlbumCache =  plugin_dir_path( dirname( __FILE__ ) ) . 'cache'; 
-        $cacheImage = new JG_Cache(  $myAlbumCache ); // Make sure it exists and is writeable
-
-        // set some defaults...
-        $total_num_albums = isset($total_num_albums) ? $total_num_albums : "0";
-        $num_photos  = isset($num_photos) ? $num_photos : "0";
-
-        // Make cache name
-        $cacheName = 'imagesList-' . $total_num_albums . '-' . $num_results . '-' . $cws_page . '-' . $cws_album;
-        $response = $cacheImage->get($cacheName);
-
-        if( $cws_debug == "1" ){ 
-            echo "<strong>From cache, response.</strong><br>";
-            echo '<pre>';
-            print_r($response);
-            echo '</pre>';
-        }
-
-        if ( $enable_cache === true ) {
-                //error_log("Calling feed to cache...");                    
-
-            // If no cache file found get feed and cache it...
-            if ( $response === FALSE ) {
-                //error_log( '***** CALLING IMAGE FEED AND CACHING RESULT *******' );
-                // $response = $plugin_admin->getAlbumImages( $AccessToken, $thumb_size, $show_title, $cws_page, $num_results, $cws_album, $imgmax );
-                $response = $plugin_admin->getAlbumImages( $AccessToken, $thumb_size, $show_title, $cws_page, $num_results, $cws_album, $imgmax, $theme );
-
-                if( $cws_debug == "1" ){ 
-                    echo "<strong>Setting cache, response.</strong><br>";
-                    echo '<pre>';
-                    print_r($response);
-                    echo '</pre>';
-                }
-
-                $cacheImage->set($cacheName, $response);
-            } else {
-                //error_log( '***** IMAGE FEED IS ALREADY CACHED *******' );
-            }
-        } else {
-
-                // try and empty cache...
-                $files = glob( $myAlbumCache . '/*' ); // get all file names
-                
-                if ( !empty( $files ) ) {
-                    foreach( $files as $file ){ // iterate files
-                      if( is_file( $file ) )
-                        unlink( $file ); // delete file
-                    }
-                }
-
-                // $response = $plugin_admin->getAlbumImages( $AccessToken, $thumb_size, $show_title, $cws_page, $num_results, $cws_album, $imgmax );
-                $response = $plugin_admin->getAlbumImages( $AccessToken, $thumb_size, $show_title, $cws_page, $num_results, $cws_album, $imgmax, $theme );  
-                //error_log("Calling feed normally...");                       
-        }
-        //
-        //error_log("Calling Feed for album id: $cws_album");  
-        #----------------------------------------------------------------------------
-        # Convert the XML response into SimpleXML Object
-        #----------------------------------------------------------------------------
-        if (!function_exists('produce_XML_object_tree')) {
-
-            function produce_XML_object_tree( $response ) {
-                libxml_use_internal_errors( true );
-                try {
-                    // Create simplexml object from feed
-                    $xml = new SimpleXMLElement( $response );
-                }  catch ( Exception $e ) {
-                    // Something went wrong.
-                    $error_message = 'SimpleXMLElement threw an exception.';
-                    foreach( libxml_get_errors() as $error_line ) {
-                        $error_message .= "\t" . $error_line->message;
-                    }
-                    //trigger_error( $error_message );
-                    return false;
-                }
-                return $xml;
-            } // end function produce
-
-        }
-
-        // Create SimpleXML Object
-        $xml = produce_XML_object_tree ( $response );
-
-        if( $cws_debug == "1" ){ 
-            echo "<strong>xml tree.</strong><br>";
-            echo '<pre>';
-            print_r($xml);
-            echo '</pre>';
-        }
-
+        //$theme = 'grid';
+// var_dump($args['theme']);
         // Decide which layout to use to display the albums
-        switch( $theme ) {
+        switch( $args['theme'] ) {
 
             #----------------------------------------------------------------------------
             # Justified Image Grid Layout *** PRO ONLY ***
             #----------------------------------------------------------------------------
             case "projig":
+
                 // enque styles
-                if( $plugin->get_isPro() == 1 ){
+                if( $plugin->get_isPro() == 1 ) {
 
                     $dataToBePassed = array();
 
@@ -269,8 +168,8 @@ $strOutput .=  $strOutput;
                     wp_register_script( 'cws_gpp_init_jig', plugin_dir_url( __FILE__ )  . '../shortcodes/partials_pro/projig/js/init_jig.js' );
                     
                     $dataToBePassed = array(
-                        'imgmax'    => "$imgmax",
-                        'rowheight' => "$row_height",
+                        'imgmax'    => "{$args['imgmax']}",
+                        'rowheight' => "{$args['row_height']}",
                     );
                     wp_localize_script( 'cws_gpp_init_jig', 'php_vars', $dataToBePassed );
                     wp_enqueue_script( 'cws_gpp_init_jig', array( 'cws_gpp_jig' ), false , false );
@@ -278,65 +177,18 @@ $strOutput .=  $strOutput;
                     ////wp_enqueue_script( 'cws_gpp_lightbox', plugin_dir_url( __FILE__ )  . '../shortcodes/partials_pro/propbs/js/lightbox.js', array( 'jquery' ), false, true );
 
 
-                    include 'partials_pro/pro_jig.php';
-                    include 'partials_pro/photoswipe.html'; 
+                    include 'partials_pro/pro_jigGP.php';
+                    // include 'partials_pro/photoswipe.html'; // moved this into related partial and used file_get_contents to fix WP 5 'update failed' bug
                 }
                 break;
 
-
-            #----------------------------------------------------------------------------
-            # Photbooth Strips Layout *** PRO ONLY ***
-            #----------------------------------------------------------------------------
-            // This view has been deprecated 28/11/16
-            // Left code in to support users still using it...
-            case "propbs":
-                // enque styles
-                if( $plugin->get_isPro() == 1 ){
-                    wp_enqueue_style( 'propbs-style3', plugin_dir_url( __FILE__ )  . '../shortcodes/partials_pro/propbs/css/style.css' );
-                    wp_enqueue_style( 'propbs-style2', plugin_dir_url( __FILE__ )  . '../shortcodes/partials_pro/propbs/css/demo.css' );
-                    wp_enqueue_style( 'propbs-style1', plugin_dir_url( __FILE__ )  . '../shortcodes/partials_pro/propbs/css/lightbox.css' );
-
-                    // Include Javascript
-                    wp_enqueue_script( 'cws_gpp_lightbox', plugin_dir_url( __FILE__ )  . '../shortcodes/partials_pro/propbs/js/lightbox.js', array( 'jquery' ), false, true ); 
-                    //wp_enqueue_script( 'cws_gpp_modernizr', plugin_dir_url( __FILE__ )  . '../shortcodes/partials_pro/propbs/js/modernizr.custom.52731.js', array(  ), false, false ); 
-                  
-                    // Initialize any scripts?
-                    include 'partials_pro/pro_pbs.php';
-                }
-                break;
-
-            #----------------------------------------------------------------------------
-            # Polaroid Stack Grid Layout *** PRO ONLY ***
-            #----------------------------------------------------------------------------
-            // This view has been deprecated 28/11/16
-            // Left code in to support users still using it...                
-            case "propsg":
-                // enque styles
-                if( $plugin->get_isPro() == 1 ){
-
-                    wp_enqueue_style( 'propsg-style3', plugin_dir_url( __FILE__ )  . '../shortcodes/partials_pro/propsg/css/square-loader.min.css' );
-                    wp_enqueue_style( 'propsg-style2', plugin_dir_url( __FILE__ )  . '../shortcodes/partials_pro/propsg/css/demo.css' );
-                    wp_enqueue_style( 'propsg-style1', plugin_dir_url( __FILE__ )  . '../shortcodes/partials_pro/propsg/css/component.css' );
-
-                    // Include Javascript
-                    wp_enqueue_script( 'cws_gpp_classie', plugin_dir_url( __FILE__ )  . '../shortcodes/partials_pro/propsg/js/classie.js', array(  ), false, true ); 
-                    wp_enqueue_script( 'cws_gpp_dynamics', plugin_dir_url( __FILE__ )  . '../shortcodes/partials_pro/propsg/js/dynamics.min.js', array(  ), false, true ); 
-                    wp_enqueue_script( 'cws_gpp_imagesLoaded', plugin_dir_url( __FILE__ )  . '../shortcodes/partials_pro/propsg/js/imagesloaded.pkgd.min.js', array(  ), false, true ); 
-                    wp_enqueue_script( 'cws_gpp_main', plugin_dir_url( __FILE__ )  . '../shortcodes/partials_pro/propsg/js/main.js', array(  ), false, true ); 
-
-                  
-                    // Initialize any scripts?
-
-                    include 'partials_pro/pro_psg.php';
-                }
-                break;
 
             #----------------------------------------------------------------------------
             # Grid Layout
             #----------------------------------------------------------------------------
             case "grid":
 
-                include 'partials/results_grid.php';
+                include 'partials/results_gridGP.php';
                 
                 // Include Masonry
                 wp_enqueue_script( 'cws_gpp_masonry', plugin_dir_url( __FILE__ )  . '../public/js/masonry.pkgd.min.js', array( 'jquery' ), false, true ); 
@@ -347,7 +199,7 @@ $strOutput .=  $strOutput;
 
                 // If Pro use Photoswipe for improved responsiveness and better ux
                 if( $plugin->get_isPro() == 1 ){
-                    //include 'partials_pro/photoswipe.html'; 
+                    // include 'partials_pro/photoswipe.html'; // moved this into related partial and used file_get_contents to fix WP 5 'update failed' bug
 
                     if( $plugin->get_isPro() == 1 ){
                         // Enque Pro FX CSS
@@ -361,24 +213,25 @@ $strOutput .=  $strOutput;
                     // Include Javascript
                     wp_enqueue_script( 'cws_gpp_ps', plugin_dir_url( __FILE__ )  . '../shortcodes/partials_pro/props/js/photoswipe.min.js', array(), false, false ); 
                     wp_enqueue_script( 'cws_gpp_psui', plugin_dir_url( __FILE__ )  . '../shortcodes/partials_pro/props/js/photoswipe-ui-default.min.js', array(), false, false ); 
+                    //wp_enqueue_script( 'cws_gpp_psui', plugin_dir_url( __FILE__ )  . '../shortcodes/partials_pro/props/js/photoswipe-ui-default.js', array(), false, false ); 
+
                     wp_enqueue_script( 'cws_gpp_init_ps', plugin_dir_url( __FILE__ )  . '../shortcodes/partials_pro/grid/js/init_ps.js', array( 'jquery' ), false, false );
                     // end inclucde PhotoSwipe files
-                } else {
-       /// wp_enqueue_style( 'lightbox', plugin_dir_url( __FILE__ ) . '../public/css/lightbox/lightbox.css', array(), $this->version, 'all' );
-                    
+                } 
+                // Lite version
+                else {
                     wp_enqueue_script( 'cws_gpp_lightbox', plugin_dir_url( __FILE__ )  . '../public/js/lightbox/lightbox.js', array( 'jquery' ), false, true );                                         
-                    // Initialize Lightbox
                     wp_enqueue_script( 'cws_gpp_init_lightbox', plugin_dir_url( __FILE__ )  . '../public/js/lightbox/init_lightbox.js', array( 'cws_gpp_lightbox' ), false , true );
                 }
-                break;
 
+                break;
 
             #----------------------------------------------------------------------------
             # List Layout
-            #----------------------------------------------------------------------------   
+            #----------------------------------------------------------------------------
             case "list":
 
-                include 'partials/results_list.php';
+                include 'partials/results_listGP.php';
 
                 // Enque Pro FX CSS
                 wp_enqueue_style( 'cws_pro_fx', plugin_dir_url( __FILE__ )  . '../shortcodes/partials_pro/css/style_fx.css' );
@@ -386,7 +239,7 @@ $strOutput .=  $strOutput;
                 // If Pro use Photoswipe for improved responsiveness and better ux
                 if( $plugin->get_isPro() == 1 ){
 
-                    //include 'partials_pro/photoswipe.html'; 
+                    //include 'partials_pro/photoswipe.html'; // moved this into related partial and used file_get_contents to fix WP 5 'update failed' bug
 
                     // Start include PhotoSwipe files
                     wp_enqueue_style( 'props-style1', plugin_dir_url( __FILE__ )  . '../shortcodes/partials_pro/props/css/photoswipe.css' );
@@ -404,7 +257,7 @@ $strOutput .=  $strOutput;
                     // Initialize Lightbox
                     wp_enqueue_script( 'cws_gpp_init_lightbox', plugin_dir_url( __FILE__ )  . '../public/js/lightbox/init_lightbox.js', array( 'cws_gpp_lightbox' ), false , true );                   
                 }
-              
+
                 break;
 
 
@@ -413,7 +266,7 @@ $strOutput .=  $strOutput;
             #----------------------------------------------------------------------------   
             case "carousel":
 
-                include 'partials/results_carousel.php';
+                include 'partials/results_carouselGP.php';
 
                 // Enque Pro FX CSS
 //                wp_enqueue_style( 'cws_pro_fx', plugin_dir_url( __FILE__ )  . '../shortcodes/partials_pro/css/style_fx.css' );
@@ -428,12 +281,6 @@ $strOutput .=  $strOutput;
                     "slidestoscroll"  => 1,
                     "speed"  => 2000,
                 ), $atts));
-/*
-echo "slidestoshow: $slidestoshow<br>";
-echo "arrows: $arrows<br>";
-echo "autoplay_interval: $autoplay_interval<br>";
-echo "slidestoscroll: $slidestoscroll<br>";
-*/
 
                 if( $arrows ) { $arrows = $arrows; } else { $arrows = false; }
                 if( $infinite ) { $infinite = $infinite; } else { $infinite = false; }
@@ -464,7 +311,7 @@ echo "slidestoscroll: $slidestoscroll<br>";
                 // If Pro use Photoswipe for improved responsiveness and better ux
                 if( $plugin->get_isPro() == 1 ){
 
-                    //include 'partials_pro/photoswipe.html'; 
+                    // include 'partials_pro/photoswipe.html'; // moved this into related partial and used file_get_contents to fix WP 5 'update failed' bug
 
                     // Start include PhotoSwipe files
                     wp_enqueue_style( 'props-style1', plugin_dir_url( __FILE__ )  . '../shortcodes/partials_pro/props/css/photoswipe.css' );
@@ -505,29 +352,11 @@ echo "slidestoscroll: $slidestoscroll<br>";
                 break;
 
             #----------------------------------------------------------------------------
-            # Expander Layout - is this being used by people? Needs improving!
-            #----------------------------------------------------------------------------  
-            case "expander";
-
-                // Add Javascript
-                // Include Modernizr
-                wp_enqueue_script( 'cws_gpp_modernizr', plugin_dir_url( __FILE__ )  . '../public/js/modernizr.custom.js', array(), false, false );  
-
-                // Include Grid
-                wp_enqueue_script( 'cws_gpp_grid', plugin_dir_url( __FILE__ )  . '../public/js/grid.js', array( 'cws_gpp_modernizr' ), false , true );
-                
-                // Initialize Grid
-                wp_enqueue_script( 'cws_gpp_init_grid', plugin_dir_url( __FILE__ )  . '../public/js/init_grid.js', array( 'cws_gpp_grid' ), false , true );
-            
-                include 'partials/results_expander.php';
-                break;
-
-            #----------------------------------------------------------------------------
             # Default Layout - Grid
             #----------------------------------------------------------------------------   
             default:
 
-                include 'partials/results_grid.php';
+                include 'partials/results_gridGP.php';
                 
                 // Include Masonry
                 wp_enqueue_script( 'cws_gpp_masonry', plugin_dir_url( __FILE__ )  . '../public/js/masonry.pkgd.min.js', array( 'jquery' ), false, true ); 
@@ -538,11 +367,13 @@ echo "slidestoscroll: $slidestoscroll<br>";
 
                 // If Pro use Photoswipe for improved responsiveness and better ux
                 if( $plugin->get_isPro() == 1 ){
-                    include 'partials_pro/photoswipe.html'; 
+                    // include 'partials_pro/photoswipe.html'; // moved this into related partial and used file_get_contents to fix WP 5 'update failed' bug
 
-                // Enque Pro FX CSS
-                wp_enqueue_style( 'cws_pro_fx', plugin_dir_url( __FILE__ )  . '../shortcodes/partials_pro/css/style_fx.css' );
-
+                    if( $plugin->get_isPro() == 1 ){
+                        // Enque Pro FX CSS
+                        wp_enqueue_style( 'cws_pro_fx', plugin_dir_url( __FILE__ )  . '../shortcodes/partials_pro/css/style_fx.css' );
+                    }
+                    
                     // Start include PhotoSwipe files
                     wp_enqueue_style( 'props-style1', plugin_dir_url( __FILE__ )  . '../shortcodes/partials_pro/props/css/photoswipe.css' );
                     wp_enqueue_style( 'props-style2', plugin_dir_url( __FILE__ )  . '../shortcodes/partials_pro/props/css/default-skin/default-skin.css' );
@@ -552,38 +383,24 @@ echo "slidestoscroll: $slidestoscroll<br>";
                     wp_enqueue_script( 'cws_gpp_psui', plugin_dir_url( __FILE__ )  . '../shortcodes/partials_pro/props/js/photoswipe-ui-default.min.js', array(), false, false ); 
                     wp_enqueue_script( 'cws_gpp_init_ps', plugin_dir_url( __FILE__ )  . '../shortcodes/partials_pro/grid/js/init_ps.js', array( 'jquery' ), false, false );
                     // end inclucde PhotoSwipe files
-                } else {                    
+                } 
+                // Lite version
+                else {
                     wp_enqueue_script( 'cws_gpp_lightbox', plugin_dir_url( __FILE__ )  . '../public/js/lightbox/lightbox.js', array( 'jquery' ), false, true );                                         
-                    // Initialize Lightbox
                     wp_enqueue_script( 'cws_gpp_init_lightbox', plugin_dir_url( __FILE__ )  . '../public/js/lightbox/init_lightbox.js', array( 'cws_gpp_lightbox' ), false , true );
                 }
-
         }
-        //echo "before pagintaion<br>";
-        #----------------------------------------------------------------------------
-        # Show output for pagination
-        #----------------------------------------------------------------------------
-        /*
-        echo "num_photos: $num_photos<br>";
-        echo "num_results: $num_results<br>";
-        echo "num_pages: $num_pages<br>";
-        */
-        
-        if( $num_results > 0 ){
-            $num_pages  = ceil( $num_photos / $num_results );
-        }
+            // Pagination - why is there no previousPageToken!?
+            if( isset($response[0]['nextPageToken'] ) ) {
+                // $next = '?nextToken=' . $response[0]['nextPageToken'];
+                $next = '?nextToken=' . $response[0]['nextPageToken'] . '&cws_album=' . $cws_album; // also inc album id some how
+                $strOutput .= "<a class='cws-next-button' href='$next'>Next</a>";
+            }
 
-        // If someone has done some url hacking reset page to something sensible
-        if ( isset($cws_page) && $cws_page > $num_pages ) { $cws_page = $num_pages; }
-        // var_dump($cws_album);
-        // total results, num to show per page, current page, album id optional
-        $strOutput .= $plugin_admin->get_pagination( $num_photos, $num_results, $cws_page, $cws_album );
+        //die($response);
+        //die('Album id from get ' . $cws_album);
 
-        return $strOutput;
-
-
-//} // test end foreach
-
+            return $strOutput;
 
     }   // end if authenticated check 
     

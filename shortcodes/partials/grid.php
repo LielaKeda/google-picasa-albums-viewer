@@ -1,11 +1,10 @@
 <?php
     $strOutput .=  "<div class='listviewxxx'>\n";
-	// $fx="style1";
     
-    if( false ){
+    if( $fx===NULL ){
         $strOutput .=  "<style>.grid-item.albums{ width: " . $album_thumb_size . "px !important; }</style>\n";
     } else {
-        $strOutput .=  "<style>.grid-item.albums{ width: " . $album_thumb_size . "px !important; height: " . ($album_thumb_size+45) . "px !important; }</style>\n";
+        $strOutput .=  "<style>.grid-item.albums{ width: " . $album_thumb_size . "px !important; height: " . $album_thumb_size . "px !important; }</style>\n";
     }
 
     //$intColumnWidth = $thumb_size + 20;
@@ -20,7 +19,7 @@ $intColumnWidth = $thumb_size * 1.3;
     // Init masonry 
     //$strOutput .= "<div class='grid js-masonry' data-masonry-options='{ \"itemSelector\": \"figure\", \"columnWidth\": ".$intColumnWidth.", \"isOriginLeft\": true, \"isFitWidth\": true }'>\n";
     //$strOutput .= "<div class='grid js-masonry' data-masonry-options='{ \"itemSelector\": \"figure\", \"columnWidth\": figure, \"isOriginLeft\": true, \"isFitWidth\": true }'>\n";
-      $strOutput .= "<div class='grid' data-masonry-options='{ \"itemSelector\": \"figure\", \"isOriginLeft\": true, \"isFitWidth\": true }'>\n";
+      $strOutput .= "<div class='grid js-masonry' data-masonry-options='{ \"itemSelector\": \"figure\", \"isOriginLeft\": true, \"isFitWidth\": true }'>\n";
 
     if( $xml === false ) {
         echo 'Sorry there has been a problem with your feed.';
@@ -148,10 +147,10 @@ $intColumnWidth = $thumb_size * 1.3;
                         if ( $show_title ) {
                             if ( get_option( 'permalink_structure' ) ) { 
                                 $urltitle = urlencode( $title );
-                                $strOutput .=  "<li class='title'><a style='color:#000;' href='" .$results_page . "?cws_album=$id[0]&cws_album_title=$urltitle'>$title</a>, <small style='font-size:75%'>$num_photos</small></li>\n";
+                                $strOutput .=  "<li class='title'><a href='" .$results_page . "?cws_album=$id[0]&cws_album_title=$urltitle'>$title</a></li>\n";
                             } else {
                                 $urltitle = urlencode( $title );
-                                $strOutput .=  "<li class='title'><a style='color:#000;' href='" .$results_page . "&cws_album=$id[0]&cws_album_title=$urltitle'>$title</a>, <small style='font-size:75%'>$num_photos</small></li>\n";
+                                $strOutput .=  "<li class='title'><a href='" .$results_page . "&cws_album=$id[0]&cws_album_title=$urltitle'>$title</a></li>\n";
                             }
                         }
 

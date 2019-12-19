@@ -18,6 +18,7 @@
 */
 function cws_gpp_shortcode_albums( $atts ) {
 
+    $cws_debug = '';
     $cws_page = '';
 
     if ( isset( $_GET['cws_debug'] ) ) {
@@ -192,7 +193,7 @@ function cws_gpp_shortcode_albums( $atts ) {
                     }
                     trigger_error( $error_message );
                     return false;
-                }		
+                }
                 return $xml;
             } // end function produce
 
@@ -200,27 +201,15 @@ function cws_gpp_shortcode_albums( $atts ) {
 
         // Create SimpleXML Object
         $xml = produce_XML_object_tree ( $response );
-		
-		//get enough albums so that the hidden ones don't create gaps
-		// $more = 0;
-		// $options = get_option( 'cws_gpp_options' );
-		// foreach( $xml->entry as $feed ) {
-			// $title = $feed->title;
-			// if( in_array( $title, $hide_albums ) ) {
-				// $more++;
-			// }
-		// }
-		// $response = $plugin_admin->getAlbumList( $AccessToken, $album_thumb_size, $show_title, $cws_page, ($num_results+$more), $visibility );
-        // $xml = produce_XML_object_tree ( $response );
 
-        // if ( isset( $_GET['cws_debug'] ) ) {
-            // if( $cws_debug == "1" ){ 
-                // echo "<strong>xml tree.</strong><br>";
-                // echo '<pre>';
-                // print_r($xml);
-                // echo '</pre>';
-            // }
-        // }
+        if ( isset( $_GET['cws_debug'] ) ) {
+            if( $cws_debug == "1" ){ 
+                echo "<strong>xml tree.</strong><br>";
+                echo '<pre>';
+                print_r($xml);
+                echo '</pre>';
+            }
+        }
 
 
         // Get Albums
