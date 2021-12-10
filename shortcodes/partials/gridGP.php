@@ -17,10 +17,13 @@ if(isset($_GET['cws_debug'])){
     for( $i = 0; $i < count( $albums ); $i++ ) {
 
         // Do not display if album name has been hidden
-        if( !in_array( $albums[$i]['title'], $args['hide_albums'] ) ) {
+        if( !isset($albums[$i]['title']) || (isset($albums[$i]['title']) && !in_array( $albums[$i]['title'], $args['hide_albums']) ) ) {
 
             $imgUrl = $albums[$i]['coverPhotoBaseUrl'] . $google_photos->addDimensions($args['album_thumb_size'], null, $settings['crop']);
-            $img = "<a href='{$settings['results_page']}?cws_album={$albums[$i]['id']}&cws_album_title={$albums[$i]['title']}'><img src='$imgUrl'>";
+			$imgUrl = str_replace('=w175-c','=w450-c',$imgUrl);
+			$titt = isset($albums[$i]['title'])?$albums[$i]['title']:"";
+			$iddd = isset($albums[$i]['id'])?$albums[$i]['id']:"";
+            $img = "<a href='{$settings['results_page']}?cws_album={$iddd}&cws_album_title={$titt}'><img src='$imgUrl'>";
 
                 switch($args['fx']) {
                     case "style1":
@@ -117,10 +120,10 @@ if(isset($_GET['cws_debug'])){
 
                 if ( $args['show_title'] ) {
                     if ( get_option( 'permalink_structure' ) ) { 
-                        $urltitle = urlencode( $albums[$i]['title'] );
+                        $urltitle = urlencode( isset($albums[$i]['title'])?$albums[$i]['title']:"" );
                         $strOutput .=  "<li class='title'><a href='" .$args['results_page'] . "?cws_album={$albums[$i]['id']}&cws_album_title=$urltitle'>{$albums[$i]['title']}</a></li>\n";
                     } else {
-                        $urltitle = urlencode( $albums[$i]['title'] );
+                        $urltitle = urlencode( isset($albums[$i]['title'])?$albums[$i]['title']:"" );
                         $strOutput .=  "<li class='title'><a href='" .$args['results_page'] . "&cws_album={$albums[$i]['id']}&cws_album_title=$urltitle'>{$albums[$i]['title']}</a></li>\n";
                     }
                 }
