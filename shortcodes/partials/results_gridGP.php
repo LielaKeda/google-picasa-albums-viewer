@@ -1,22 +1,28 @@
 <?php
-/*
-echo '<pre>';
-print_r( $response[0]['mediaItems'] );
+
+
+//function get_top_image(){
+//	return '.$response[0]['mediaItems'][0]['baseUrl'] . 
+//$google_photos->addDimensions($args['thumb_size'], 
+//$args['thumb_size'], $args['crop']).'" />';
+//}
+//echo '<pre>';
+//print_r( $response[0]['mediaItems'] );
 //print_r($settings['dimensions']['maxWidth']);
-echo '</pre>';
-*/
+//echo '</pre>';
+
 //die();
 
     $strOutput = '';
     $cws_album_title    = '';
 
     // moved this here to fix WP 5 'update failed' bug
-    if( $plugin->get_isPro() == 1 ){
-        $pathPhotoswipe = plugin_dir_path( __FILE__ ) . '../partials_pro/photoswipe.html';
-        $strPhotoswipe = file_get_contents($pathPhotoswipe);
-        //var_dump($strPhotoswipe);
-        $strOutput .= $strPhotoswipe;
-    }
+    // if( $plugin->get_isPro() == 1 ){
+        // $pathPhotoswipe = plugin_dir_path( __FILE__ ) . '../partials_pro/photoswipe.html';
+        // $strPhotoswipe = file_get_contents($pathPhotoswipe);
+        // //var_dump($strPhotoswipe);
+        // $strOutput .= $strPhotoswipe;
+    // }
 
     if( isset( $_GET['cws_album_title'] ) ){ $cws_album_title =  stripslashes( $_GET[ 'cws_album_title' ] ); }
     if ( $cws_album_title ) { $strOutput .= "<div id='album_title'><h2>$cws_album_title</h2></div>\n"; }
@@ -75,9 +81,10 @@ echo '</pre>';
         if( $plugin->get_isPro() == 1 ){
             $imgUrlBIG      = $response[0]['mediaItems'][$i]['baseUrl'] . $google_photos->addDimensions( $args['imgmax'], null, 0 );        // Big image for overlay, setting a max width
         } else {
-            $imgUrlBIG      = $response[0]['mediaItems'][$i]['baseUrl'] . $google_photos->addDimensions( 800, null, 0 );        // Big image for overlay, setting a max width
+            $imgUrlBIG      = $response[0]['mediaItems'][$i]['baseUrl'] . $google_photos->addDimensions( 2000, null, 0 );        // Big image for overlay, setting a max width
         }
         $imgUrl         = $response[0]['mediaItems'][$i]['baseUrl'] . $google_photos->addDimensions($args['thumb_size'], $args['thumb_size'], $args['crop']);
+		$imgUrl = str_replace('=w175-h175-c','=w450-h450-c',$imgUrl);
 
         $strOutput .= "<figure class=\"effect-$strFXStyle\" data-index=\"".$i."\" itemprop=\"associatedMedia\" itemscope itemtype=\"http://schema.org/ImageObject\">\n";   
         $strOutput .= "<div class='thumbnail grid-item images' data-index=\"".$i."\" style='width:".$args['thumb_size']."px;'>\n";
@@ -97,7 +104,8 @@ echo '</pre>';
         $height         = $width / $ratio_orig;                                         // work out height for image 
 // echo "width: $width<br>ratio_orig: $ratio_orig<br>height: $height<br>";
         // include overlay data attributes required for Photo Swipe
-        $strOutput .= "<a itemprop='$imgUrlBIG' data-size='{$width}x{$height}' data-index=\"".$i."\" class='result-image-link' href='$imgUrlBIG' data-lightbox='result-set' data-title='$title'>\n";
+        // $strOutput .= "<a itemprop='$imgUrlBIG' data-size='{$width}x{$height}' data-index=\"".$i."\" class='result-image-link' href='$imgUrlBIG' data-lightbox='result-set' data-title='$title'>\n";
+        $strOutput .= "<a data-type='image' class='result-image-link' href='$imgUrlBIG' data-fslightbox='gallery' >\n";
         $strOutput .="<img data-index=\"".$i."\" class='result-image' src='" . $imgUrl . "' alt='$title'/>";
 
             // if fx value has been set in shortcode...
